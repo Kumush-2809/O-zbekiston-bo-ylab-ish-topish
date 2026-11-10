@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="uz"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IshTop – O‘zbekiston bo‘ylab ish topish</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#e8f1fc;--card:#fff;--tx:#12233d;--mu:#5a6e8c;--br:#cfdcf0;--ac:#1565c0;--ac2:#dcebfc;--wa:#b45309}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1a2e;--card:#16253d;--tx:#e6eefb;--mu:#9bb0d1;--br:#27395a;--ac:#5aa9ff;--ac2:#1b3558;--wa:#f0a64b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1a2e;--card:#16253d;--tx:#e6eefb;--mu:#9bb0d1;--br:#27395a;--ac:#5aa9ff;--ac2:#1b3558;--wa:#f0a64b;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--card);border-bottom:1px solid var(--br);z-index:5}
+.bar{max-width:1050px;margin:auto;padding:10px 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.logo{font-weight:800;font-size:20px;color:var(--ac);margin-right:auto;cursor:pointer}
+button,select,input,textarea{font:inherit;color:var(--tx)}
+.btn{background:var(--ac);color:#fff;border:0;border-radius:10px;padding:9px 15px;cursor:pointer;font-weight:600}
+.btn.o{background:transparent;color:var(--ac);border:1px solid var(--ac)}
+.nav{background:none;border:0;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--mu);font-weight:600}.nav.on{color:var(--ac);background:var(--ac2)}
+main{max-width:1050px;margin:auto;padding:18px 16px 60px}
+h1{font-size:28px;margin:6px 0}h2{font-size:20px;margin:22px 0 10px}p.s{color:var(--mu);margin:0 0 14px}
+.hero{background:linear-gradient(135deg,#1565c0,#2196f3);color:#fff;border-radius:16px;padding:22px;margin-bottom:8px}.hero .s{color:#e3f0ff}.hero .btn{background:#fff;color:#1565c0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.tile{background:var(--card);border:1px solid var(--br);border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;justify-content:space-between;gap:8px;text-align:left}
+.tile:hover{border-color:var(--ac)}.tile b{font-weight:600}.tile span{color:var(--ac);font-weight:700}
+.card{background:var(--card);border:1px solid var(--br);border-radius:14px;padding:16px;margin-bottom:12px}
+.jobs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.tag{display:inline-block;background:var(--ac2);color:var(--ac);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;margin:2px 4px 2px 0}
+.mu{color:var(--mu);font-size:13px}.sal{color:var(--wa);font-weight:700}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+select,input,textarea{background:var(--card);border:1px solid var(--br);border-radius:10px;padding:9px 11px;width:100%}
+.filters select{width:auto;flex:1;min-width:150px}
+label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:560px){.row{grid-template-columns:1fr}}
+.modal{position:fixed;inset:0;background:#0009;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:20px 12px;z-index:20}
+.box{background:var(--card);border-radius:16px;padding:20px;width:100%;max-width:520px}
+.choice{display:flex;gap:10px;margin:14px 0}.choice button{flex:1;padding:22px 10px;border:2px solid var(--br);background:var(--card);border-radius:14px;cursor:pointer;font-weight:700;font-size:17px}
+.choice button:hover{border-color:var(--ac);color:var(--ac)}
+.err{color:#d33;font-size:13px;margin-top:8px}.empty{text-align:center;color:var(--mu);padding:30px}.star{float:right;background:none;border:0;font-size:22px;cursor:pointer;color:var(--wa)}#lang{width:auto;padding:7px 8px}
+.x{float:right;background:none;border:0;font-size:22px;cursor:pointer;color:var(--mu)}
+</style></head><body>
+<header><div class="bar"><div class="logo" onclick="go('home')">IshTop 🇺🇿</div>
+<button class="nav" data-v="home" onclick="go('home')">Ishlar</button>
+<button class="nav" data-v="regions" onclick="go('regions')">Viloyatlar</button>
+<button class="nav" data-v="cats" onclick="go('cats')">Yo‘nalishlar</button>
+<button class="nav" data-v="saved" onclick="go('saved')">Saqlanganlar</button>
+<select id="lang" data-nt onchange="setLang(this.value)" aria-label="Language"><option value="uz">🌐 O‘zbekcha</option><option value="en">🌐 English</option><option value="ru">🌐 Русский</option></select><span id="auth"></span></div></header>
+<main id="app"></main><div id="modal"></div>
+<script>
+const REG={"Toshkent shahri":["Chilonzor","Yunusobod","Mirzo Ulug‘bek","Yakkasaroy","Sergeli","Olmazor","Shayxontohur"],
+"Toshkent viloyati":["Nurafshon","Chirchiq","Angren","Olmaliq","Zangiota","Qibray"],
+"Andijon":["Andijon sh.","Asaka","Shahrixon","Xo‘jaobod","Marhamat"],
+"Buxoro":["Buxoro sh.","G‘ijduvon","Kogon","Vobkent","Qorako‘l"],
+"Farg‘ona":["Farg‘ona sh.","Marg‘ilon","Qo‘qon","Quvasoy","Rishton"],
+"Jizzax":["Jizzax sh.","Zarafshon","Forish","G‘allaorol"],
+"Xorazm":["Urganch","Xiva","Xonqa","Shovot"],
+"Namangan":["Namangan sh.","Chust","Pop","Uychi","Kosonsoy"],
+"Navoiy":["Navoiy sh.","Zarafshon","Karmana","Uchquduq"],
+"Qashqadaryo":["Qarshi","Shahrisabz","Kitob","G‘uzor","Koson"],
+"Samarqand":["Samarqand sh.","Kattaqo‘rg‘on","Urgut","Bulung‘ur","Jomboy"],
+"Sirdaryo":["Guliston","Yangiyer","Shirin","Sirdaryo t."],
+"Surxondaryo":["Termiz","Denov","Sherobod","Boysun","Sariosiyo"],
+"Qoraqalpog‘iston":["Nukus","Xo‘jayli","Qo‘ng‘irot","To‘rtko‘l","Beruniy"]};
+const CATS=["Savdo va sotuv","Qurilish","IT va dasturlash","Ta’lim","Sog‘liqni saqlash","Haydovchi va logistika","Restoran va xizmat ko‘rsatish","Ishlab chiqarish","Qishloq xo‘jaligi","Moliya va buxgalteriya","Marketing va dizayn","Boshqa"];
+const IC={"Savdo va sotuv":"🛒","Qurilish":"🏗️","IT va dasturlash":"💻","Ta’lim":"🎓","Sog‘liqni saqlash":"🩺","Haydovchi va logistika":"🚚","Restoran va xizmat ko‘rsatish":"🍽️","Ishlab chiqarish":"🏭","Qishloq xo‘jaligi":"🌾","Moliya va buxgalteriya":"💼","Marketing va dizayn":"🎨","Boshqa":"📌"};
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const $=id=>document.getElementById(id);
+const load=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const age=d=>{if(!d)return 0;const b=new Date(d),n=new Date();let a=n.getFullYear()-b.getFullYear();if(n<new Date(n.getFullYear(),b.getMonth(),b.getDate()))a--;return a};
+const seedJobs=[
+{id:"s1",title:"Sotuvchi-maslahatchi",cat:"Savdo va sotuv",reg:"Toshkent shahri",dis:"Chilonzor",exp:1,amin:18,amax:35,sal:"3 000 000 so‘m",shop:"Mevazor do‘koni",addr:"Chilonzor 9-kvartal",tel:"+998901112233",desc:"Muloyim, mas’uliyatli xodim kerak.",own:"seed"},
+{id:"s2",title:"Frontend dasturchi",cat:"IT va dasturlash",reg:"Toshkent shahri",dis:"Yunusobod",exp:2,amin:20,amax:40,sal:"10 000 000 so‘m",shop:"TechUz MChJ",addr:"Yunusobod 4-mavze",tel:"+998935556677",desc:"React bilan tajriba.",own:"seed"},
+{id:"s3",title:"Oshpaz yordamchisi",cat:"Restoran va xizmat ko‘rsatish",reg:"Samarqand",dis:"Samarqand sh.",exp:0,amin:18,amax:45,sal:"2 500 000 so‘m",shop:"Registon Cafe",addr:"Registon ko‘chasi 12",tel:"+998941234567",desc:"Ish tajribasi shart emas, o‘rgatamiz.",own:"seed"},
+{id:"s4",title:"Qurilish ustasi",cat:"Qurilish",reg:"Farg‘ona",dis:"Qo‘qon",exp:3,amin:22,amax:55,sal:"5 000 000 so‘m",shop:"Qo‘qon Qurilish",addr:"Turkiston ko‘chasi 5",tel:"+998977654321",desc:"Pardozlash ishlari.",own:"seed"},
+{id:"s5",title:"Matematika o‘qituvchisi",cat:"Ta’lim",reg:"Andijon",dis:"Andijon sh.",exp:1,amin:21,amax:50,sal:"4 000 000 so‘m",shop:"Zukko xususiy maktabi",addr:"Bobur shoh ko‘chasi 20",tel:"+998909998877",desc:"Oliy ma’lumotli.",own:"seed"},
+{id:"s6",title:"Yuk mashinasi haydovchisi",cat:"Haydovchi va logistika",reg:"Navoiy",dis:"Navoiy sh.",exp:3,amin:25,amax:55,sal:"6 000 000 so‘m",shop:"NavTrans",addr:"Sanoat zonasi",tel:"+998915550011",desc:"C toifali guvohnoma.",own:"seed"}];
+seedJobs.forEach(j=>j.stud=["s1","s3","s5"].includes(j.id));
+const seedSeekers=[
+{id:"k1",role:"seeker",fio:"Karimov Aziz Bahodirovich",tel:"+998901000001",bd:"2001-05-14",reg:"Toshkent shahri",dis:"Chilonzor",addr:"Chilonzor",uni:"TATU",expY:1,expT:"Do‘konda 1 yil sotuvchi",cat:"Savdo va sotuv"},
+{id:"k2",role:"seeker",fio:"Rahimova Nilufar Anvarovna",tel:"+998901000002",bd:"1999-02-03",reg:"Samarqand",dis:"Samarqand sh.",addr:"Registon",uni:"SamDU",expY:0,expT:"Yangi bitiruvchi",cat:"Restoran va xizmat ko‘rsatish"},
+{id:"k3",role:"seeker",fio:"Toshmatov Jasur Olimovich",tel:"+998901000003",bd:"1996-11-20",reg:"Toshkent shahri",dis:"Yunusobod",addr:"Yunusobod",uni:"INHA",expY:3,expT:"React, JS",cat:"IT va dasturlash"}];
+let S={fav:load("fav",[]),jobs:load("jobs",seedJobs),seekers:load("seekers",seedSeekers),user:load("user",null),view:"home",f:{reg:"",dis:"",cat:""}};
+const persist=()=>{save("fav",S.fav);save("jobs",S.jobs);save("seekers",S.seekers);save("user",S.user)};
+const opt=(arr,sel,ph)=>(ph?`<option value="">${ph}</option>`:"")+arr.map(x=>`<option ${x==sel?"selected":""}>${esc(x)}</option>`).join("");
+const regOpt=(sel,ph)=>opt(Object.keys(REG),sel,ph);
+
+function go(v,f){S.view=v;if(f)S.f={reg:"",dis:"",cat:"",...f};else if(v!="home")S.f={reg:"",dis:"",cat:""};render();scrollTo(0,0)}
+function render(){
+ document.querySelectorAll(".nav[data-v]").forEach(b=>b.classList.toggle("on",b.dataset.v==S.view));
+ $("auth").innerHTML=S.user?`<button class="nav ${S.view=="dash"?"on":""}" onclick="go('dash')">Kabinet</button><button class="btn o" onclick="logout()">Chiqish</button>`:`<button class="btn" onclick="openReg()">Ro‘yxatdan o‘tish</button>`;
+ $("app").innerHTML=({home:vHome,regions:vRegions,cats:vCats,saved:vSaved,dash:vDash})[S.view]()}
+function jobCard(j,extra=""){return `<div class="card"><button class="star" onclick="fav('${j.id}')">${S.fav.includes(j.id)?"★":"☆"}</button><b>${esc(j.title)}</b><div class="sal">${esc(j.sal||"Kelishiladi")}</div>
+<div><span class="tag">${IC[j.cat]||""} ${esc(j.cat)}</span><span class="tag">📍 ${esc(j.reg)}, ${esc(j.dis)}</span>${j.stud?'<span class="tag">🎓 Talabalar uchun</span>':''}</div>
+<div class="mu">Tajriba: ${j.exp?j.exp+" yildan":"shart emas"} · Yosh: ${j.amin}–${j.amax}</div>
+<p style="margin:8px 0">${esc(j.desc)}</p><div class="mu">🏪 <b>${esc(j.shop)}</b>, ${esc(j.addr)}<br>📞 ${S.user?`<a href="tel:${esc(j.tel)}" style="color:var(--ac)">${esc(j.tel)}</a>`:"Aloqa raqamini ko‘rish uchun ro‘yxatdan o‘ting"}</div>${extra}</div>`}
+function filtered(){const f=S.f,q=(f.q||"").toLowerCase().trim();return S.jobs.filter(j=>(!f.reg||j.reg==f.reg)&&(!f.dis||j.dis==f.dis)&&(!f.cat||j.cat==f.cat)&&(!f.stud||j.stud)&&(!q||[j.title,j.shop,j.desc,j.addr].join(" ").toLowerCase().includes(q)))}
+function filterBar(){const f=S.f;return `<div class="filters"><select onchange="S.f.reg=this.value;S.f.dis='';render()">${regOpt(f.reg,"Barcha viloyatlar")}</select>
+<select onchange="S.f.dis=this.value;render()">${opt(f.reg?REG[f.reg]:[],f.dis,"Barcha shahar/tumanlar")}</select>
+<select onchange="S.f.cat=this.value;render()">${opt(CATS,f.cat,"Barcha yo‘nalishlar")}</select><input type="search" placeholder="Kalit so‘z bo‘yicha qidirish" value="${esc(f.q||"")}" oninput="S.f.q=this.value;$('jl').innerHTML=listIn()" style="flex:2;min-width:180px"><label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" style="width:auto" ${f.stud?"checked":""} onchange="S.f.stud=this.checked;render()">Talabalar uchun</label></div>`}
+function list(){return `<div id="jl">${listIn()}</div>`}
+function listIn(r=filtered()){return r.length?`<div class="jobs">${r.map(j=>jobCard(j)).join("")}</div>`:`<div class="empty">Bu bo‘limda hozircha e’lon yo‘q.</div>`}
+function vHome(){return `<div class="hero"><h1>O‘zbekiston bo‘ylab ish toping</h1><p class="s" style="margin:0 0 12px">${S.jobs.length} ta faol e’lon · 14 ta hudud · ${CATS.length} ta yo‘nalish</p>${S.user?"":`<button class="btn" onclick="openReg()">Boshlash</button>`}</div>
+<h2>Ish e’lonlari</h2>${filterBar()}${list()}`}
+function vRegions(){if(S.f.reg)return `<button class="btn o" onclick="go('regions')">← Barcha viloyatlar</button><h2>📍 ${esc(S.f.reg)}</h2>${filterBar()}${list()}`;
+ return `<h1>Viloyatlar bo‘yicha</h1><p class="s">Hududingizni tanlang</p><div class="grid">${Object.keys(REG).map(r=>`<button class="tile" onclick="go('regions',{reg:'${r}'})"><b>📍 ${r}</b><span>${S.jobs.filter(j=>j.reg==r).length}</span></button>`).join("")}</div>`}
+function vCats(){if(S.f.cat)return `<button class="btn o" onclick="go('cats')">← Barcha yo‘nalishlar</button><h2>${IC[S.f.cat]} ${esc(S.f.cat)}</h2>${filterBar()}${list()}`;
+ return `<h1>Ish yo‘nalishlari</h1><p class="s">Sohangizni tanlang</p><div class="grid">${CATS.map(c=>`<button class="tile" onclick="go('cats',{cat:'${c}'})"><b>${IC[c]} ${c}</b><span>${S.jobs.filter(j=>j.cat==c).length}</span></button>`).join("")}</div>`}
+
+/* Saved + i18n */
+function fav(id){const i=S.fav.indexOf(id);i<0?S.fav.push(id):S.fav.splice(i,1);persist();render()}
+function vSaved(){return `<h1>⭐ Saqlanganlar</h1>`+listIn(S.jobs.filter(j=>S.fav.includes(j.id)))}
+const D=`Ishlar|Jobs|Вакансии
+Viloyatlar|Regions|Регионы
+Yo‘nalishlar|Categories|Направления
+Saqlanganlar|Saved|Избранное
+Kabinet|Dashboard|Кабинет
+Chiqish|Log out|Выйти
+Ro‘yxatdan o‘tish|Sign up|Регистрация
+O‘zbekiston bo‘ylab ish toping|Find a job anywhere in Uzbekistan|Найдите работу по всему Узбекистану
+Boshlash|Get started|Начать
+Ish e’lonlari|Job listings|Объявления о работе
+← Barcha viloyatlar|← All regions|← Все регионы
+Viloyatlar bo‘yicha|By region|По регионам
+Hududingizni tanlang|Choose your region|Выберите свой регион
+← Barcha yo‘nalishlar|← All categories|← Все направления
+Ish yo‘nalishlari|Job categories|Категории работы
+Sohangizni tanlang|Choose your field|Выберите свою сферу
+Barcha viloyatlar|All regions|Все регионы
+Barcha shahar/tumanlar|All cities/districts|Все города/районы
+Barcha yo‘nalishlar|All categories|Все направления
+Kalit so‘z bo‘yicha qidirish|Search by keyword|Поиск по ключевому слову
+Talabalar uchun|For students|Для студентов
+Talabalar va xorijiy talabalar uchun ham mos|Suitable for students and international students|Подходит студентам и иностранным студентам
+Bu bo‘limda hozircha e’lon yo‘q.|No listings in this section yet.|В этом разделе пока нет объявлений.
+Kelishiladi|Negotiable|По договорённости
+Aloqa raqamini ko‘rish uchun ro‘yxatdan o‘ting|Sign up to see the phone number|Зарегистрируйтесь, чтобы увидеть номер
+Mos ishchilarni topish|Find matching candidates|Подобрать кандидатов
+O‘chirish|Delete|Удалить
+Siz kimsiz?|Who are you?|Кто вы?
+Ish kerakmi?|Need a job?|Нужна работа?
+Ishchi kerakmi?|Need workers?|Нужны сотрудники?
+Ish qidiruvchi ma’lumotlari|Job seeker details|Данные соискателя
+Ish beruvchi ma’lumotlari|Employer details|Данные работодателя
+Ish qidiruvchi|Job seeker|Соискатель
+Telefon raqam|Phone number|Номер телефона
+Ism|First name|Имя
+Familiya|Last name|Фамилия
+Otasining ismi|Father’s name|Отчество
+Tug‘ilgan sana|Date of birth|Дата рождения
+Viloyat|Region|Область
+Shahar/tuman|City/district|Город/район
+Manzil (ko‘cha, uy)|Address (street, house)|Адрес (улица, дом)
+Qaysi universitetda o‘qigansiz yoki o‘qiyapsiz?|Which university did/do you attend?|В каком университете вы учились или учитесь?
+Masalan: TDIU, 3-kurs|e.g. TSUE, 3rd year|Например: ТГЭУ, 3 курс
+Ish tajribasi (yil)|Work experience (years)|Опыт работы (лет)
+Qiziqqan yo‘nalish|Preferred category|Желаемое направление
+Tajriba haqida|About your experience|Об опыте
+Tanlang|Select|Выберите
+Telefon raqamni to‘g‘ri kiriting.|Enter a valid phone number.|Введите корректный номер телефона.
+Ism, familiya va otasining ismini kiriting.|Enter first name, last name and father’s name.|Введите имя, фамилию и отчество.
+Tug‘ilgan sanani to‘g‘ri kiriting.|Enter a valid date of birth.|Введите корректную дату рождения.
+Viloyat va shahar/tumanni tanlang.|Select region and city/district.|Выберите область и город/район.
+Yo‘nalishni tanlang.|Select a category.|Выберите направление.
+Barcha majburiy maydonlarni to‘ldiring.|Fill in all required fields.|Заполните все обязательные поля.
+Yosh oralig‘i noto‘g‘ri.|Invalid age range.|Неверный возрастной диапазон.
+Ish qidirish|Find a job|Поиск работы
+Ish beruvchi kabineti|Employer dashboard|Кабинет работодателя
++ Ishchi uchun e’lon qo‘shish|+ Post a job|+ Добавить вакансию
+Hali e’lon qo‘shmagansiz.|You haven’t posted any jobs yet.|Вы ещё не добавили объявлений.
+Ishchi qidirish|Find candidates|Поиск кандидатов
+Mos ishchi topilmadi.|No matching candidates found.|Подходящих кандидатов не найдено.
+Min. tajriba (yil)|Min. experience (years)|Мин. опыт (лет)
+Yangi e’lon|New job listing|Новое объявление
+Qanday ishchi kerak? (lavozim)|Who do you need? (position)|Кто нужен? (должность)
+Masalan: Sotuvchi|e.g. Sales assistant|Например: Продавец
+Yo‘nalish|Category|Направление
+Kerakli tajriba (yil)|Required experience (years)|Требуемый опыт (лет)
+Oylik maosh|Monthly salary|Зарплата в месяц
+3 000 000 so‘m|3,000,000 UZS|3 000 000 сум
+Yoshi (dan)|Age (from)|Возраст (от)
+Yoshi (gacha)|Age (to)|Возраст (до)
+Do‘kon / tashkilot nomi|Shop / company name|Название магазина / организации
+To‘liq manzil|Full address|Полный адрес
+Aloqa telefoni|Contact phone|Контактный телефон
+Qo‘shimcha ma’lumot|Additional information|Дополнительная информация
+E’lonni joylash|Publish listing|Опубликовать
+Boshqa|Other|Другое
+Toshkent shahri|Tashkent city|город Ташкент
+Toshkent viloyati|Tashkent region|Ташкентская область
+Andijon|Andijan|Андижан
+Buxoro|Bukhara|Бухара
+Farg‘ona|Fergana|Фергана
+Jizzax|Jizzakh|Джизак
+Xorazm|Khorezm|Хорезм
+Namangan|Namangan|Наманган
+Navoiy|Navoi|Навои
+Qashqadaryo|Kashkadarya|Кашкадарья
+Samarqand|Samarkand|Самарканд
+Sirdaryo|Syrdarya|Сырдарья
+Surxondaryo|Surkhandarya|Сурхандарья
+Qoraqalpog‘iston|Karakalpakstan|Каракалпакстан
+Savdo va sotuv|Sales & Retail|Торговля и продажи
+Qurilish|Construction|Строительство
+IT va dasturlash|IT & Programming|IT и программирование
+Ta’lim|Education|Образование
+Sog‘liqni saqlash|Healthcare|Здравоохранение
+Haydovchi va logistika|Driving & Logistics|Водители и логистика
+Restoran va xizmat ko‘rsatish|Restaurants & Services|Рестораны и сервис
+Ishlab chiqarish|Manufacturing|Производство
+Qishloq xo‘jaligi|Agriculture|Сельское хозяйство
+Moliya va buxgalteriya|Finance & Accounting|Финансы и бухгалтерия
+Marketing va dizayn|Marketing & Design|Маркетинг и дизайн`.split("\n").map(x=>x.split("|"));
+const PT=[
+[/^Tajriba: (?:(\d+) yildan|shart emas) · Yosh: (\d+)–(\d+)$/,m=>L=="en"?`Experience: ${m[1]?m[1]+"+ yrs":"not required"} · Age: ${m[2]}–${m[3]}`:`Опыт: ${m[1]?"от "+m[1]+" лет":"не требуется"} · Возраст: ${m[2]}–${m[3]}`],
+[/^🎓 (.*) · Tajriba: (\d+) yil(?: – (.*))?$/,m=>`🎓 ${m[1]} · ${L=="en"?"Experience: "+m[2]+" yr":"Опыт: "+m[2]+" г."}${m[3]?" – "+m[3]:""}`],
+[/^· (\d+) yosh$/,m=>L=="en"?`· ${m[1]} y.o.`:`· ${m[1]} лет`],
+[/^Salom, (.*)! 👋$/,m=>(L=="en"?"Hello, ":"Здравствуйте, ")+m[1]+"! 👋"],
+[/^Sizga mos e’lonlar: (\d+)$/,m=>(L=="en"?"Jobs matching you: ":"Подходящих вам объявлений: ")+m[1]],
+[/^Mening e’lonlarim \((\d+)\)$/,m=>(L=="en"?"My listings (":"Мои объявления (")+m[1]+")"],
+[/^“(.*)” uchun mos ishchilar \((\d+)\)$/,m=>L=="en"?`Matching candidates for “${m[1]}” (${m[2]})`:`Кандидаты для «${m[1]}» (${m[2]})`],
+[/^(\d+) ta faol e’lon · (\d+) ta hudud · (\d+) ta yo‘nalish$/,m=>L=="en"?`${m[1]} active listings · ${m[2]} regions · ${m[3]} categories`:`${m[1]} активных объявлений · ${m[2]} регионов · ${m[3]} направлений`]];
+let L=load("lang","uz"),E={};
+function tx(s){if(L=="uz")return s;const t=s.trim();if(!t)return s;
+ if(E[t])return s.replace(t,()=>E[t]);
+ for(const[r,f]of PT){const m=t.match(r);if(m)return s.replace(t,()=>f(m))}
+ const m=t.match(/^([^\p{L}\d+]*)(.*)$/su);if(m[1]&&E[m[2]])return s.replace(t,()=>m[1]+E[m[2]]);
+ if(m[2].includes(", ")){const p=m[2].split(", ");if(p.some(x=>E[x]))return s.replace(t,()=>m[1]+p.map(x=>E[x]||x).join(", "))}
+ return s}
+function tr(root){if(!root||!root.querySelectorAll)return;
+ root.querySelectorAll("option:not([value])").forEach(o=>o.setAttribute("value",o.textContent));
+ root.querySelectorAll("[placeholder]").forEach(e=>{e.dataset.p0??=e.placeholder;const v=tx(e.dataset.p0);if(v!==e.placeholder)e.placeholder=v});
+ const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),ns=[];while(w.nextNode())ns.push(w.currentNode);
+ ns.forEach(n=>{const p=n.parentElement;if(!p||p.closest("[data-nt],script,style"))return;n.__o??=n.data;const v=tx(n.__o);if(v!==n.data)n.data=v})}
+function setLang(l){L=l;save("lang",l);E={};if(l!="uz")D.forEach(r=>E[r[0]]=r[l=="en"?1:2]);document.documentElement.lang=l;$("lang").value=l;tr(document.body)}
+new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>tr(n.nodeType==1?n:n.parentElement)))).observe(document.body,{childList:true,subtree:true});
+/* Registration */
+function modal(h){$("modal").innerHTML=h?`<div class="modal" onclick="if(event.target==this)modal('')"><div class="box">${h}</div></div>`:""}
+function openReg(){modal(`<button class="x" onclick="modal('')">×</button><h2 style="margin-top:0">Ro‘yxatdan o‘tish</h2><p class="s">Siz kimsiz?</p>
+<div class="choice"><button onclick="regForm('seeker')">🔎<br>Ish kerakmi?</button><button onclick="regForm('employer')">🏢<br>Ishchi kerakmi?</button></div>`)}
+function regForm(role){const s=role=="seeker";
+ modal(`<button class="x" onclick="modal('')">×</button><h2 style="margin-top:0">${s?"Ish qidiruvchi":"Ish beruvchi"} ma’lumotlari</h2>
+<label>Telefon raqam</label><input id="tel" type="tel" placeholder="+998 90 123 45 67">
+<div class="row"><div><label>Ism</label><input id="fn"></div><div><label>Familiya</label><input id="ln"></div></div>
+<label>Otasining ismi</label><input id="mn">
+<label>Tug‘ilgan sana</label><input id="bd" type="date">
+${s?`<div class="row"><div><label>Viloyat</label><select id="rg" onchange="$('ds').innerHTML=opt(REG[this.value]||[],'','Tanlang')">${regOpt("","Tanlang")}</select></div><div><label>Shahar/tuman</label><select id="ds"><option value="">Tanlang</option></select></div></div>
+<label>Manzil (ko‘cha, uy)</label><input id="ad">
+<label>Qaysi universitetda o‘qigansiz yoki o‘qiyapsiz?</label><input id="un" placeholder="Masalan: TDIU, 3-kurs">
+<div class="row"><div><label>Ish tajribasi (yil)</label><input id="ey" type="number" min="0" max="50" value="0"></div><div><label>Qiziqqan yo‘nalish</label><select id="ct">${opt(CATS,"","Tanlang")}</select></div></div>
+<label>Tajriba haqida</label><textarea id="et" rows="3"></textarea>`:""}
+<div class="err" id="err"></div><button class="btn" style="width:100%;margin-top:14px" onclick="submitReg('${role}')">Ro‘yxatdan o‘tish</button>`)}
+function submitReg(role){const v=i=>($(i)?.value||"").trim(),E=m=>$("err").textContent=m;
+ const tel=v("tel").replace(/[\s()-]/g,"");
+ if(!/^\+?\d{9,13}$/.test(tel))return E("Telefon raqamni to‘g‘ri kiriting.");
+ if(!v("fn")||!v("ln")||!v("mn"))return E("Ism, familiya va otasining ismini kiriting.");
+ if(!v("bd")||age(v("bd"))<14||age(v("bd"))>90)return E("Tug‘ilgan sanani to‘g‘ri kiriting.");
+ const u={id:"u"+Date.now(),role,tel,fio:`${v("ln")} ${v("fn")} ${v("mn")}`,bd:v("bd")};
+ if(role=="seeker"){if(!v("rg")||!v("ds"))return E("Viloyat va shahar/tumanni tanlang.");if(!v("ct"))return E("Yo‘nalishni tanlang.");
+  Object.assign(u,{reg:v("rg"),dis:v("ds"),addr:v("ad"),uni:v("un"),expY:+v("ey")||0,expT:v("et"),cat:v("ct")});S.seekers.push(u)}
+ S.user=u;persist();modal("");go("dash")}
+function logout(){S.user=null;persist();go("home")}
+
+/* Dashboards */
+function vDash(){if(!S.user){go("home");return""}return S.user.role=="seeker"?dSeeker():dEmployer()}
+function dSeeker(){const u=S.user;S.f.reg=S.f.reg||"";
+ const m=S.jobs.filter(j=>j.cat==u.cat&&j.reg==u.reg&&u.expY>=j.exp&&age(u.bd)>=j.amin&&age(u.bd)<=j.amax);
+ return `<h1>Salom, ${esc(u.fio.split(" ")[1]||u.fio)}! 👋</h1><p class="s"><span>Ish qidiruvchi</span> · <span>${esc(u.reg)}, ${esc(u.dis)}</span> · <span>${esc(u.cat)}</span></p>
+<div class="card"><b>Sizga mos e’lonlar: ${m.length}</b></div>${m.length?`<div class="jobs">${m.map(j=>jobCard(j)).join("")}</div>`:""}
+<h2>Ish qidirish</h2>${filterBar()}${list()}`}
+function dEmployer(){const u=S.user,mine=S.jobs.filter(j=>j.own==u.id);
+ return `<h1>Ish beruvchi kabineti</h1><p class="s">${esc(u.fio)} · ${esc(u.tel)}</p>
+<button class="btn" onclick="jobForm()">+ Ishchi uchun e’lon qo‘shish</button>
+<h2>Mening e’lonlarim (${mine.length})</h2>${mine.length?`<div class="jobs">${mine.map(j=>jobCard(j,`<div style="margin-top:10px"><button class="btn o" onclick="match('${j.id}')">Mos ishchilarni topish</button> <button class="nav" onclick="delJob('${j.id}')">O‘chirish</button></div>`)).join("")}</div>`:`<div class="empty">Hali e’lon qo‘shmagansiz.</div>`}
+<h2>Ishchi qidirish</h2><div class="filters"><select id="sr" onchange="seekSearch()">${regOpt("","Barcha viloyatlar")}</select><select id="sc" onchange="seekSearch()">${opt(CATS,"","Barcha yo‘nalishlar")}</select><input id="se" type="number" min="0" placeholder="Min. tajriba (yil)" style="flex:1;min-width:150px" oninput="seekSearch()"></div>
+<div id="res"></div><div id="mres"></div>`.replace('<div id="res"></div>','<div id="res">'+seekerList(S.seekers)+'</div>')}
+function seekerCard(k,note=""){return `<div class="card"><b>${esc(k.fio)}</b> <span class="mu">· ${age(k.bd)} yosh</span><div><span class="tag">${IC[k.cat]||""} ${esc(k.cat)}</span><span class="tag">📍 ${esc(k.reg)}, ${esc(k.dis)}</span></div>
+<div class="mu">🎓 ${esc(k.uni||"—")} · Tajriba: ${k.expY} yil${k.expT?" – "+esc(k.expT):""}</div><div class="mu">📞 <a href="tel:${esc(k.tel)}" style="color:var(--ac)">${esc(k.tel)}</a></div>${note}</div>`}
+function seekerList(a){return a.length?`<div class="jobs">${a.map(k=>seekerCard(k)).join("")}</div>`:`<div class="empty">Mos ishchi topilmadi.</div>`}
+function seekSearch(){const r=$("sr").value,c=$("sc").value,e=+$("se").value||0;
+ $("res").innerHTML=seekerList(S.seekers.filter(k=>(!r||k.reg==r)&&(!c||k.cat==c)&&k.expY>=e));$("mres").innerHTML=""}
+function match(id){const j=S.jobs.find(x=>x.id==id);
+ const r=S.seekers.filter(k=>k.cat==j.cat&&k.reg==j.reg&&k.expY>=j.exp&&age(k.bd)>=j.amin&&age(k.bd)<=j.amax).sort((a,b)=>(b.dis==j.dis)-(a.dis==j.dis));
+ $("mres").innerHTML=`<h2>“${esc(j.title)}” uchun mos ishchilar (${r.length})</h2>`+seekerList(r);$("mres").scrollIntoView({behavior:"smooth"})}
+function delJob(id){S.jobs=S.jobs.filter(j=>j.id!=id);persist();render()}
+function jobForm(){modal(`<button class="x" onclick="modal('')">×</button><h2 style="margin-top:0">Yangi e’lon</h2>
+<label>Qanday ishchi kerak? (lavozim)</label><input id="jt" placeholder="Masalan: Sotuvchi">
+<label>Yo‘nalish</label><select id="jc">${opt(CATS,"","Tanlang")}</select>
+<div class="row"><div><label>Kerakli tajriba (yil)</label><input id="je" type="number" min="0" value="0"></div><div><label>Oylik maosh</label><input id="js" placeholder="3 000 000 so‘m"></div></div>
+<div class="row"><div><label>Yoshi (dan)</label><input id="ja" type="number" value="18"></div><div><label>Yoshi (gacha)</label><input id="jb" type="number" value="45"></div></div>
+<label>Do‘kon / tashkilot nomi</label><input id="jn">
+<div class="row"><div><label>Viloyat</label><select id="jr" onchange="$('jd').innerHTML=opt(REG[this.value]||[],'','Tanlang')">${regOpt("","Tanlang")}</select></div><div><label>Shahar/tuman</label><select id="jd"><option value="">Tanlang</option></select></div></div>
+<label>To‘liq manzil</label><input id="jad"><label>Aloqa telefoni</label><input id="jt2" value="${esc(S.user.tel)}">
+<label>Qo‘shimcha ma’lumot</label><textarea id="jx" rows="3"></textarea><label style="display:flex;gap:8px;align-items:center"><input id="jst" type="checkbox" style="width:auto">Talabalar va xorijiy talabalar uchun ham mos</label><div class="err" id="err"></div>
+<button class="btn" style="width:100%;margin-top:14px" onclick="addJob()">E’lonni joylash</button>`)}
+function addJob(){const v=i=>$(i).value.trim();
+ if(!v("jt")||!v("jc")||!v("jn")||!v("jr")||!v("jd")||!v("jad"))return $("err").textContent="Barcha majburiy maydonlarni to‘ldiring.";
+ if(+v("ja")>+v("jb"))return $("err").textContent="Yosh oralig‘i noto‘g‘ri.";
+ S.jobs.unshift({id:"j"+Date.now(),title:v("jt"),cat:v("jc"),reg:v("jr"),dis:v("jd"),exp:+v("je")||0,amin:+v("ja"),amax:+v("jb"),sal:v("js"),shop:v("jn"),addr:v("jad"),tel:v("jt2"),desc:v("jx"),stud:$("jst").checked,own:S.user.id});
+ persist();modal("");render()}
+render();setLang(L);
+</script></body></html>
